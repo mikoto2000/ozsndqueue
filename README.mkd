@@ -1,0 +1,40 @@
+ozsndqueue
+==========
+
+通知音管理のためのキューサービス
+
+
+Usage:
+------
+
+TODO
+
+Requirements:
+-------------
+
+デフォルトでは、下記ソフトウェアに依存しています。
+
+- [dbus](http://www.freedesktop.org/wiki/Software/dbus/)
+- mpg321
+- aplay
+
+
+Install:
+--------
+
+TODO
+
+License:
+--------
+
+Copyright (C) 2015 mikoto2000
+
+This software is released under the MIT License, see LICENSE
+
+このソフトウェアは MIT ライセンスの下で公開されています。 LICENSE を参照してください。
+
+
+Author:
+-------
+
+mikoto2000 <mikoto2000@gmail.com>
