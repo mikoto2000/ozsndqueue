@@ -1,0 +1,90 @@
+/**
+ * ozsndqueue
+ *
+ * クラス図を画像で確認したい場合は、
+ * 下記ソフトウェアを使用して画像に変換してください。
+ *
+ * - [Graphviz | Graphviz - Graph Visualization Software](http://www.graphviz.org/)
+ * - [mikoto2000/ozcld](https://github.com/mikoto2000/ozcld)
+ *
+ */
+classdiagram ozsndqueue {
+    class main {
+        ==
+        ==
+        "- createDefaultSoundService() : *ozsndqueue.SoundService";
+        "- createDefaultListenerService() : *ozsndqueue.ListenerService";
+        "- createDefaultCallbackService() : *ozsndqueue.CallbackService";
+    }
+    class ozsndqueue {
+        ==
+        "- frozen SERVICE_NAME string = \"jp.dip.oyasirazu.ozsndqueue\" ";
+        "- frozen PLAY_CMD_WAV_DEFAULT string = \"aplay\" ";
+        "- frozen PLAY_CMD_MP3_DEFAULT string = \"mpg321\" ";
+        ==
+    }
+    class ListenerService {
+        stereotype: interface;
+        ==
+        ==
+        "+ StartListen() : void";
+        "+ PauseListen() : void";
+        "+ StartPlay() : void";
+        "+ PausePlay() : void";
+        "+ Stop() : void";
+        "+ Put(fileUri : string, queueName : string) : void";
+        "+ PlayNow(fileUri : string, queueName : string) : void";
+    }
+    class SoundService {
+        stereotype: interface;
+        ==
+        ==
+        "+ Play(fileUri string) : void";
+    }
+    class CallbackService {
+        stereotype: interface;
+        ==
+        ==
+        "- onStartListen() : void";
+        "- onPauseListen() : void";
+        "- onStartPlay() : void";
+        "- onPausePlay() : void";
+        "- onStop() : void";
+        "- onPut(fileUri : string, queueName : string) : void";
+        "- onPlayNow(fileUri : string, queueName : string) : void";
+        "- onFinishPlay(fileUri : string) : void";
+    }
+    class DBusListenerService {
+        ==
+        "- conn : *dbus.Conn";
+        ==
+    }
+    class DBusCallbackService {
+        ==
+        "- conn : *dbus.Conn";
+        ==
+    }
+    class NaiveSoundService {
+        ==
+        "- playCmdWav string";
+        "- playCmdMp3 string";
+        ==
+    }
+    class SoundManager {
+        stereotype: interface;
+        ==
+        "- listenerService : ListenerService";
+        "- callbackService : CallbackService";
+        "- soundService : SoundService";
+        ==
+        "+ Start() : void";
+        "+ Stop() : void";
+    }
+    DBusListenerService .|> ListenerService;
+    DBusCallbackService .|> CallbackService;
+    NaiveSoundService .|> SoundService;
+    SoundManager -> ListenerService;
+    SoundManager -> CallbackService;
+    SoundManager -> SoundService;
+    main -> SoundManager;
+}
