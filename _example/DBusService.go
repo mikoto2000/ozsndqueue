@@ -21,6 +21,32 @@ import (
 	"syscall"
 )
 
+type MyListenerService struct {}
+
+func (this MyListenerService) StartListen() {
+	fmt.Println("StartListen")
+}
+
+func (this MyListenerService) PauseListen() {
+	fmt.Println("PauseListen")
+}
+
+func (this MyListenerService) StartPlay() {
+	fmt.Println("StartPlay")
+}
+
+func (this MyListenerService) PausePlay() {
+	fmt.Println("PausePlay")
+}
+
+func (this MyListenerService) Put(fileUri string, queueNumber int32) {
+	fmt.Println("Put:", fileUri, queueNumber)
+}
+
+func (this MyListenerService) PlayNow(fileUri string) {
+	fmt.Println("PlayNow:", fileUri)
+}
+
 func main() {
 	// 終了通知用 channel
 	stopChan := make(chan int)
@@ -31,6 +57,8 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+
+	dbusService.ListenerService = MyListenerService{}
 
 	// 停止シグナル待ち受け goroutine 作成
 	go captureSigint(stopChan)
