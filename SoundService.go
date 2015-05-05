@@ -1,5 +1,5 @@
 package ozsndqueue
 
 type SoundService interface {
-	Play(fileUri string)
+	Play(fileUri string) error
 }

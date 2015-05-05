@@ -5,12 +5,17 @@ import (
 )
 
 type SoundManager struct {
+	soundService SoundService
 	priorityQueue map[int][]string
 }
 
 func CreateSoundManager() *SoundManager {
+
 	soundManager := &SoundManager{}
+
+	soundManager.soundService = NaiveSoundService{}
 	soundManager.priorityQueue = make(map[int][]string)
+
 	return soundManager
 }
 
@@ -27,12 +32,14 @@ func (this *SoundManager) Put(fileUri string, queueNumber int) {
 }
 
 // Play, 一番優先順位の高いファイルを再生する。
-func (this *SoundManager) Play() {
+func (this *SoundManager) Play() error {
 	if len(this.priorityQueue) == 0 {
-		return
+		return nil
 	}
 
-	this.prioritiedDequeue()
+	fileUri := this.prioritiedDequeue()
+
+	return this.soundService.Play(fileUri)
 }
 
 // prioritiedDequeue, キュー郡から一番優先順位の高いファイル名を取得する。
@@ -45,7 +52,7 @@ func (this *SoundManager) prioritiedDequeue() string {
 	// キーを抜き出してスライスに詰める
 	keys := []int{}
 	for key := range this.priorityQueue {
-		 keys = append(keys, key)
+		keys = append(keys, key)
 	}
 
 	// 優先度順にソート
