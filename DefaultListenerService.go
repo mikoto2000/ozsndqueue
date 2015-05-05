@@ -5,7 +5,15 @@ import (
 )
 
 type DefaultListenerService struct {
-	SoundService SoundService
+	SoundManager *SoundManager
+}
+
+func CreateDefaultListenerService(queueSize int) *DefaultListenerService {
+	defaultListenerService := &DefaultListenerService{}
+
+	defaultListenerService.SoundManager = CreateSoundManager(queueSize)
+
+	return defaultListenerService
 }
 
 func (this DefaultListenerService) StartListen() {

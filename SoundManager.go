@@ -1,25 +1,78 @@
 package ozsndqueue
 
 import (
+	"fmt"
 	"sort"
 )
 
 type SoundManager struct {
 	SoundService SoundService
 	priorityQueue map[int][]string
+	isListen bool
+	isPlay bool
+	// Put された事を通知する channel
+	putChan chan int
+	// 終了依頼が出されたことを通知する channel
+	endChan chan int
 }
 
-func CreateSoundManager() *SoundManager {
+func CreateSoundManager(queueSize int) *SoundManager {
 
 	soundManager := &SoundManager{}
 
 	soundManager.SoundService = NaiveSoundService{}
 	soundManager.priorityQueue = make(map[int][]string)
+	soundManager.isListen = true
+	soundManager.isPlay = true
+
+	soundManager.putChan = make(chan int, queueSize)
+	soundManager.endChan = make(chan int)
 
 	return soundManager
 }
 
+func (this SoundManager) StartMainLoop() {
+	this.mainLoop()
+}
+
+func (this SoundManager) mainLoop() {
+	for {
+		select {
+		case <-this.putChan:
+			this.PlayNext()
+		case <-this.endChan:
+			return
+		}
+	}
+}
+
+func (this SoundManager) Stop() {
+	this.endChan <- 0
+}
+
+func (this SoundManager) StartListen() {
+	this.isListen = true
+}
+
+func (this SoundManager) PauseListen() {
+	this.isListen = false
+}
+
+func (this SoundManager) StartPlay() {
+	this.isPlay = true
+}
+
+func (this SoundManager) PausePlay() {
+	this.isPlay = false
+}
+
+// TODO: Put を無視した場合の戻り値を考える。
 func (this *SoundManager) Put(fileUri string, queueNumber int) {
+	// listen 中でなければ Put されたものを無視する
+	if !this.isListen {
+		return
+	}
+
 	_, exist := this.priorityQueue[queueNumber]
 
 	// key の存在確認。
@@ -29,12 +82,15 @@ func (this *SoundManager) Put(fileUri string, queueNumber int) {
 	}
 
 	this.priorityQueue[queueNumber] = append(this.priorityQueue[queueNumber], fileUri)
+
+	// Put 通知を channel に投げる。
+	this.putChan <- 0
 }
 
-// Play, 一番優先順位の高いファイルを再生する。
-func (this *SoundManager) Play() error {
+// PlayNext, 一番優先順位の高いファイルを再生する。
+func (this *SoundManager) PlayNext() error {
 	if len(this.priorityQueue) == 0 {
-		return nil
+		return fmt.Errorf("priority queue is empty")
 	}
 
 	fileUri := this.prioritiedDequeue()
