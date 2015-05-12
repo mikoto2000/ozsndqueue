@@ -35,9 +35,18 @@ const SERVICE_INTRO = `<node>
 		</interface>` + introspect.IntrospectDataString + `</node> `
 
 type DBusService struct {
-	ListenerService ListenerService
+	DBusServiceListener DBusServiceListener
 	conn     *dbus.Conn
 	stopChan chan int
+}
+
+type DBusServiceListener interface {
+	StartListen()
+	PauseListen()
+	StartPlay()
+	PausePlay()
+	Put(fileUri string, queueNumber int32)
+	PlayNow(fileUri string)
 }
 
 // CreateDBusService, DBus サービスを作成する。
@@ -69,43 +78,43 @@ func CreateDBusService(stopChan chan int) (*DBusService, error) {
 }
 
 func (this *DBusService) StartListen() *dbus.Error {
-	if this.ListenerService != nil {
-		this.ListenerService.StartListen()
+	if this.DBusServiceListener != nil {
+		this.DBusServiceListener.StartListen()
 	}
 	return nil
 }
 
 func (this *DBusService) PauseListen() *dbus.Error {
-	if this.ListenerService != nil {
-		this.ListenerService.PauseListen()
+	if this.DBusServiceListener != nil {
+		this.DBusServiceListener.PauseListen()
 	}
 	return nil
 }
 
 func (this *DBusService) StartPlay() *dbus.Error {
-	if this.ListenerService != nil {
-		this.ListenerService.StartPlay()
+	if this.DBusServiceListener != nil {
+		this.DBusServiceListener.StartPlay()
 	}
 	return nil
 }
 
 func (this *DBusService) PausePlay() *dbus.Error {
-	if this.ListenerService != nil {
-		this.ListenerService.PausePlay()
+	if this.DBusServiceListener != nil {
+		this.DBusServiceListener.PausePlay()
 	}
 	return nil
 }
 
 func (this *DBusService) Put(fileUri string, queueNumber int32) *dbus.Error {
-	if this.ListenerService != nil {
-		this.ListenerService.Put(fileUri, queueNumber)
+	if this.DBusServiceListener != nil {
+		this.DBusServiceListener.Put(fileUri, queueNumber)
 	}
 	return nil
 }
 
 func (this *DBusService) PlayNow(fileUri string) *dbus.Error {
-	if this.ListenerService != nil {
-		this.ListenerService.PlayNow(fileUri)
+	if this.DBusServiceListener != nil {
+		this.DBusServiceListener.PlayNow(fileUri)
 	}
 	return nil
 }

@@ -8,8 +8,7 @@ dbus-send --dest=jp.dip.oyasirazu.ozsndqueue --type=method_call --print-reply /j
 dbus-send --dest=jp.dip.oyasirazu.ozsndqueue --type=method_call --print-reply /jp/dip/oyasirazu/ozsndqueue jp.dip.oyasirazu.ozsndqueue.StartPlay
 dbus-send --dest=jp.dip.oyasirazu.ozsndqueue --type=method_call --print-reply /jp/dip/oyasirazu/ozsndqueue jp.dip.oyasirazu.ozsndqueue.PausePlay
 dbus-send --dest=jp.dip.oyasirazu.ozsndqueue --type=method_call --print-reply /jp/dip/oyasirazu/ozsndqueue jp.dip.oyasirazu.ozsndqueue.Put string:"PATH_TO_FILE" int32:0
-dbus-send --dest=jp.dip.oyasirazu.ozsndqueue --type=method_call --print-reply /jp/dip/oyasirazu/ozsndqueue jp.dip.oyasirazu.ozsndqueue.PlayNow string:"PATH_TO_FILE"
-*/
+dbus-send --dest=jp.dip.oyasirazu.ozsndqueue --type=method_call --print-reply /jp/dip/oyasirazu/ozsndqueue jp.dip.oyasirazu.ozsndqueue.PlayNow string:"PATH_TO_FILE" */
 
 package main
 
@@ -58,7 +57,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	dbusService.ListenerService = ExampleListenerService{}
+	dbusService.DBusServiceListener = ExampleListenerService{}
 
 	// 停止シグナル待ち受け goroutine 作成
 	go captureSigint(stopChan)
