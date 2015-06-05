@@ -66,6 +66,10 @@ func (this SoundManager) PausePlay() {
 	this.isPlay = false
 }
 
+func (this *SoundManager) Play(fileUri string) error {
+	return this.SoundService.Play(fileUri)
+}
+
 // TODO: Put を無視した場合の戻り値を考える。
 func (this *SoundManager) Put(fileUri string, queueNumber int) {
 	// listen 中でなければ Put されたものを無視する
@@ -95,7 +99,7 @@ func (this *SoundManager) PlayNext() error {
 
 	fileUri := this.prioritiedDequeue()
 
-	return this.SoundService.Play(fileUri)
+	return this.Play(fileUri)
 }
 
 // prioritiedDequeue, キュー郡から一番優先順位の高いファイル名を取得する。
@@ -148,3 +152,32 @@ func dequeue(fileUris []string) (string, []string) {
 	// この前に長さチェックしてるからそのまま返せるはず。
 	return fileUris[0], fileUris[1:len(fileUris)]
 }
+
+type DBusServiceListenerForSoundManager struct {
+	SoundManager *SoundManager
+}
+
+func (this DBusServiceListenerForSoundManager) StartListen() {
+	this.SoundManager.StartListen()
+}
+
+func (this DBusServiceListenerForSoundManager) PauseListen() {
+	this.SoundManager.PauseListen()
+}
+
+func (this DBusServiceListenerForSoundManager) StartPlay() {
+	this.SoundManager.StartPlay()
+}
+
+func (this DBusServiceListenerForSoundManager) PausePlay() {
+	this.SoundManager.PausePlay()
+}
+
+func (this DBusServiceListenerForSoundManager) Put(fileUri string, queueNumber int32) {
+	this.SoundManager.Put(fileUri, int(queueNumber))
+}
+
+func (this DBusServiceListenerForSoundManager) PlayNow(fileUri string) {
+	this.SoundManager.Play(fileUri)
+}
+
