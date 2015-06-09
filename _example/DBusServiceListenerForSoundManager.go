@@ -4,6 +4,8 @@ import (
 	"../../ozsndqueue"
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -26,5 +28,19 @@ func main() {
 	// 停止シグナル待ち受け goroutine 作成
 	go captureSigint(stopChan)
 
+	// SoundManager のメインループ開始
+	go soundManager.StartMainLoop()
+
+	// DBusService 開始
 	dbusService.Run()
+}
+
+func captureSigint(stop chan int) {
+	sigint := make(chan os.Signal)
+	signal.Notify(sigint, syscall.SIGINT)
+
+	// stop シグナル待ち受け。
+	// stop シグナルが来たら停止用 channel に送信
+	<-sigint
+	stop <- 0
 }
